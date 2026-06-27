@@ -213,8 +213,6 @@ void suspend_wakeup_init_user(void) {
   cur_palette = LIGHT;
 }
 
-bool key_lock_waiting = false;
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     /* Do QK_LLCK on tap, do regular layer change on hold */
@@ -273,6 +271,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   }
 }
 
+const uint32_t BLINK_HALF_PERIOD = 300; // milliseconds
+bool blink_state = true;
+
+uint32_t blink_state_toggle(uint32_t trigger_time, void *cb_arg) {
+    blink_state = !blink_state;
+    return BLINK_HALF_PERIOD;
+}
+
+// Return value ignored since we never need to cancel the timer
+void keyboard_post_init_user(void) {
+  defer_exec(BLINK_HALF_PERIOD, blink_state_toggle, NULL);
+}
+
+// Single-use macro real quick
 #define SET_BRIGHT_IF(A) {\
   if (A) { \
     cur_color = PALETTES[cur_palette][3]; \
@@ -291,7 +303,7 @@ bool rgb_matrix_indicators_user(void) {
 
     switch (i) {
       case 0:
-        SET_BRIGHT_IF(is_swap_hands_on());
+        SET_BRIGHT_IF(blink_state && is_swap_hands_on());
       case 24:
         SET_BRIGHT_IF(mods & MOD_BIT(KC_LGUI));
       case 39:
@@ -300,8 +312,8 @@ bool rgb_matrix_indicators_user(void) {
         SET_BRIGHT_IF(mods & MOD_BIT(KC_LCTL));
       case 41:
         SET_BRIGHT_IF(mods & MOD_BIT(KC_LSFT));
-      case 46:
-        SET_BRIGHT_IF(key_lock_waiting || is_key_locked());
+      case 45:
+        SET_BRIGHT_IF(is_key_lock_waiting() || (blink_state && is_layer_locked(get_highest_layer(layer_state))));
       default:
         default_label:
         cur_color = PALETTES[cur_palette][COLORMAPS[biton32(layer_state)][i]];
