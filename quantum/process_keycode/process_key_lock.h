@@ -22,4 +22,4 @@
 
 void cancel_key_lock(void);
 bool process_key_lock(uint16_t *keycode, keyrecord_t *record);
-bool is_key_lock_waiting();
+bool is_key_lock_waiting(void);
