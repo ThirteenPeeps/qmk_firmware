@@ -46,6 +46,10 @@
 uint64_t key_state[4] = {0x0, 0x0, 0x0, 0x0};
 bool     watching     = false;
 
+bool is_key_lock_waiting() {
+    return watching;
+}
+
 // Translate any OSM keycodes back to their unmasked versions.
 static inline uint16_t translate_keycode(uint16_t keycode) {
     if (keycode > QK_ONE_SHOT_MOD && keycode <= QK_ONE_SHOT_MOD_MAX) {
