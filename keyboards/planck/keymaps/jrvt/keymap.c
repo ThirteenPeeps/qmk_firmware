@@ -114,9 +114,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
   [_NUM] = LAYOUT_planck_grid( // Num contains number row and the common symbols
-    _______, KC_GRV,  _______, _______, _______, _______, _______, _______, _______, KC_MINS, KC_EQL,  _______,
+    _______, KC_GRV,  _______, _______, _______, _______, _______, KC_MINS, KC_EQL,  KC_LBRC, KC_RBRC, _______,
     _______, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    _______,
-    _______, KC_LT,   KC_GT,   _______, _______, _______, _______, _______, _______, KC_LBRC, KC_RBRC, _______,
+    _______, _______, _______, _______, _______, _______, _______, _______, KC_LT,   KC_GT,   KC_PIPE, _______,
     _______, _______, _______, _______, _______, _______, _______, KC_BSPC, LT_LLCK, _______, _______, _______
   ),
 
@@ -180,9 +180,9 @@ const uint8_t COLORMAPS[][RGB_MATRIX_LED_COUNT] = {
     0, 0, 0, 1, 1, 1, 0, 1, 3, 2, 0, 0, 0
   },
   [_NUM] = {
-    2, 1, 0, 0, 0, 0,    0, 0, 0, 2, 2, 1,
+    2, 1, 0, 0, 0, 0,    0, 1, 1, 2, 2, 1,
     0, 2, 2, 2, 3, 2,    2, 3, 2, 2, 2, 0,
-    1, 2, 2, 0, 0, 0,    0, 0, 0, 2, 2, 1,
+    1, 0, 0, 0, 0, 0,    0, 0, 2, 2, 1, 1,
     0, 0, 0, 1, 1, 1, 0, 3, 1, 2, 0, 0, 0
   },
   [_FNC] = {
@@ -285,9 +285,9 @@ void keyboard_post_init_user(void) {
 }
 
 // Single-use macro real quick
-#define SET_BRIGHT_IF(A) {\
+#define SET_COLOR_IF(I, A) {\
   if (A) { \
-    cur_color = PALETTES[cur_palette][3]; \
+    cur_color = PALETTES[cur_palette][I]; \
     break; \
   } else { \
     goto default_label; \
@@ -303,17 +303,33 @@ bool rgb_matrix_indicators_user(void) {
 
     switch (i) {
       case 0:
-        SET_BRIGHT_IF(blink_state && is_swap_hands_on());
+        SET_COLOR_IF(3, blink_state && is_swap_hands_on());
       case 24:
-        SET_BRIGHT_IF(mods & MOD_BIT(KC_LGUI));
+        if (keymap_config.swap_lctl_lgui) {
+          if (mods & MOD_BIT(KC_LCTL)) {
+            SET_COLOR_IF(blink_state ? 3 : 2, true); // Breaks
+          } else {
+            SET_COLOR_IF(blink_state ? 1 : 2, true); // Breaks
+          }
+        } else {
+          SET_COLOR_IF(3, mods & MOD_BIT(KC_LGUI)); // Breaks
+        }
       case 39:
-        SET_BRIGHT_IF(mods & MOD_BIT(KC_LALT));
+        SET_COLOR_IF(3, mods & MOD_BIT(KC_LALT));
       case 40:
-        SET_BRIGHT_IF(mods & MOD_BIT(KC_LCTL));
+        if (keymap_config.swap_lctl_lgui) {
+          if (mods & MOD_BIT(KC_LGUI)) {
+            SET_COLOR_IF(blink_state ? 3 : 2, true); // Breaks
+          } else {
+            SET_COLOR_IF(blink_state ? 1 : 2, true); // Breaks
+          }
+        } else {
+          SET_COLOR_IF(3, mods & MOD_BIT(KC_LCTL)); // Breaks
+        }
       case 41:
-        SET_BRIGHT_IF(mods & MOD_BIT(KC_LSFT));
+        SET_COLOR_IF(3, mods & MOD_BIT(KC_LSFT));
       case 45:
-        SET_BRIGHT_IF(is_key_lock_waiting() || (blink_state && is_layer_locked(get_highest_layer(layer_state))));
+        SET_COLOR_IF(3, is_key_lock_waiting() || (blink_state && is_layer_locked(get_highest_layer(layer_state))));
       default:
         default_label:
         cur_color = PALETTES[cur_palette][COLORMAPS[biton32(layer_state)][i]];
