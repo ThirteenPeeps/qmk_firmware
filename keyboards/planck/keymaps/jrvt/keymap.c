@@ -7,7 +7,7 @@
  * - Way to toggle numrow keys for numpad
  * - Emulated mouse keys
  * - Enable alternate default layer for wasd games that lets numbers and f-keys be accessed with one hand somehow
- * - Add print screen, display swap buttons. Maybe refactor brt/vol to share (mute can be display off/on)
+ * - Add display swap buttons. Maybe refactor brt/vol to share (mute can be display off/on)
  * - Something to toggle whether a mod is left/right
  */
 
@@ -230,7 +230,7 @@ const uint8_t COLORMAPS[][RGB_MATRIX_LED_COUNT] = {
     ___, ___, ___, DIM, DIM, DIM, ___, BRT, DIM, MDL, ___, ___, ___
   },
   [_FNC] = {
-    MDL, ___, ___, ___, ___, ___,      MDL, MDL, MDL, MDL, MDL, DIM,
+    MDL, ___, ___, ___, MDL, ___,      MDL, MDL, MDL, MDL, MDL, DIM,
     MDL, DIM, DIM, DIM, BRT, DIM,      DIM, BRT, DIM, DIM, DIM, MDL,
     DIM, ___, ___, ___, ___, ___,      ___, MDL, MDL, MDL, ___, DIM,
     ___, ___, ___, DIM, DIM, DIM, ___, DIM, MDL, BRT, ___, ___, ___
